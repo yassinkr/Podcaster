@@ -87,15 +87,9 @@ export function FormCreatePodcast() {
   });
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
-    const user = auth();
+   
     console.log("submitting");
-    await insertPodcast({
-      title:values.podcastTitle,
-      description:values.Description,
-      audioURL:PodcastURL,
-      imageURL:imageURL,
-      userId:user.userId,
-    });
+    
   }
   return (
     <section className="mt-10 flex flex-col">
