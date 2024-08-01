@@ -33,12 +33,12 @@ export const Users = createTable(
 
 export const podcast = createTable(
   'podcast',
-  {
+  {id : serial('id').primaryKey(),
     title: text('title').notNull(),
     description: text('description').notNull(),
-    audioURL : text('audioURL').notNull().primaryKey(),
+    audioURL : text('audioURL').notNull(),
     userId: text('userId').references(()=>Users.clerkId),
-    imageURL: text('imageURL'),
+    imageURL: text('imageURL').notNull(),
     createdAt: timestamp("createdAt", { withTimezone: true }).defaultNow().notNull(),
     views: integer('views').default(0).notNull(),
 

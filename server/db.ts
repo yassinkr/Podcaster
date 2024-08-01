@@ -44,6 +44,12 @@ export async function getTopUserByPodcastCount() {
   }).from(schema.podcast).groupBy(sql`${schema.podcast.userId}`).orderBy(sql`COUNT(*)`, sql`DESC`).limit(1).execute();
   }
 
+  export async function getPodcastById (id?: number)  {
+    if(!id) throw new Error('id is required');
+    return await db.query.podcast.findFirst(
+      {where:(model,{eq})=>eq(model.id,id),}
+     );
+  }
   export async function getPodcastByURL  (url: string ) {
     if(!url) throw new Error("no url");
     return await db.query.podcast.findFirst({where:(eq(schema.podcast.audioURL,url))})

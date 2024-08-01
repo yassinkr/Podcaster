@@ -1,8 +1,10 @@
 import React from 'react'
 import Image from 'next/image'
-const PodcastCard = ({imgURL,title,description,podcastId}:{imgURL:string,title:string,description:string,podcastId:number}) => {
+import Link from 'next/link'
+const PodcastCard = ({imgURL,title,description,id}:{imgURL:string,title:string,description:string,id:number}) => {
+
   return (
-    <div className='cursor-pointer'>
+    <Link className='cursor-pointer' href={`/podcast/${id}`}>
       <figure className=' flex flex-col gap-2'>
       <Image src={imgURL} alt={title} width={174} height={174}  className='aspect-square h-fit w-full rounded-xl'/>
       <div className=' flex flex-col '>
@@ -10,7 +12,7 @@ const PodcastCard = ({imgURL,title,description,podcastId}:{imgURL:string,title:s
         <h2 className='text-12 truncate font-normal capitalize text-white-4'>{description}</h2>
       </div>
       </figure>
-    </div>
+    </Link>
   )
 }
 
