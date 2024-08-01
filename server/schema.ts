@@ -37,7 +37,7 @@ export const podcast = createTable(
     title: text('title').notNull(),
     description: text('description').notNull(),
     audioURL : text('audioURL').notNull().primaryKey(),
-    userId: text('userId').references(()=>Users.id),
+    userId: text('userId').references(()=>Users.clerkId),
     imageURL: text('imageURL'),
     createdAt: timestamp("createdAt", { withTimezone: true }).defaultNow().notNull(),
     views: integer('views').default(0).notNull(),
@@ -49,23 +49,7 @@ export const podcast = createTable(
   })
 );
 
-export const images = createTable(
-  'images',
-  {
-    id: text('id').primaryKey(),
-    name: text('title').notNull(),
-    podcast : text('audioStorageId').notNull(),
-    audioURL : text('audioURL').notNull(),
-    userId: integer('userId').references(()=>Users.id),
-    imageURL: text('imageURL').notNull(),
-    createdAt: timestamp('createdAt').defaultNow().notNull(),
 
-
-  },
-  (example) => ({
-    titleIndex: index("titleInd").on(example.name),
-  })
-);
 
 
   

@@ -1,11 +1,8 @@
-// Note: `useUploadThing` is IMPORTED FROM YOUR CODEBASE using the `generateReactHelpers` function
 "use client";
-import { useCallback, useState } from "react";
-import { generateClientDropzoneAccept } from "uploadthing/client";
+import {  useCallback, useState, useTransition } from "react";
  
-import { useUploadThing } from "@/utils/uploadthing";
 import { z } from "zod";
-import { useForm } from "react-hook-form";
+import { useForm,  } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Button } from "./ui/button";
 import { Loader } from "lucide-react";
@@ -21,10 +18,13 @@ import {
 import { Textarea } from "@/components/ui/textarea";
 import { Input } from "@/components/ui/input";
 import  MyDropzone  from "./DropZone";
+import { Podcast } from "@/types";
+import { QueryResult } from "@vercel/postgres";
 import { insertPodcast } from "@/server/db";
-import { auth } from "@clerk/nextjs/server";
-import { toast } from "sonner";
-import { useRouter } from "next/navigation";
+import { podcast } from "@/server/schema";
+import { useFormState } from "react-dom";
+import { title } from "process";
+
  
 
 const formSchema = z.object({
@@ -45,38 +45,20 @@ const formSchema = z.object({
     );
   }
 
-export function FormCreatePodcast() {
-  const [files, setFiles] = useState<File[]>([]);
-  const router = useRouter();
-  const onDrop = useCallback((acceptedFiles: File[]) => {
-    setFiles(acceptedFiles);
-  }, []);
- 
-  const { startUpload, permittedFileInfo } = useUploadThing(
-    "podcast",
-    {
-      onClientUploadComplete: () => {
-        toast("Upload complete!");
-        router.refresh();
-          },
-      onUploadError: () => {
-        toast.dismiss("upload_begin");
-        toast.error("Upload failed");
-          },
-      onUploadBegin: () => {
-        toast(<div className="flex gap-2 text-white items-center"><LoadingSpinnerSvg /><span className="text-lg">Uploading...</span></div>);
-    },
-    },
-  );
- 
-  const fileTypes = permittedFileInfo?.config
-    ? Object.keys(permittedFileInfo?.config)
-    : [];
- 
+const initialState = {
+  title: "",
+  description: "",
+  audioURL: "",
+  imageURL: "",
+  userId: "",
+}
+export  function FormCreatePodcast(
+ { insertPodcast }: { insertPodcast: (podcast: Podcast) => Promise<Podcast> }
+) {
+  
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [PodcastURL, setPodcastURL] = useState<string>("");
   const [imageURL, setImageURL] = useState<string>("");
-  
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -86,16 +68,23 @@ export function FormCreatePodcast() {
     },
   });
 
-  async function onSubmit(values: z.infer<typeof formSchema>) {
-   
-    console.log("submitting");
-    
-  }
+
+
   return (
     <section className="mt-10 flex flex-col">
       <h1 className='text-xl font-bold text-white-1'>Create Podcast</h1>
       <Form {...form}>
-      <form   onSubmit={form.handleSubmit(onSubmit)} className="space-y-8 mt-12 flex flex-col w-full">
+      <form action = {
+        async ()=>{
+        const {podcastTitle,Description}=form.getValues();
+        const podcast:Podcast = {title:podcastTitle,
+          description:Description,
+          audioURL : PodcastURL, 
+          imageURL: imageURL};
+      
+      const newpodcast= await insertPodcast(podcast);
+       console.log(newpodcast);
+      }}  className="space-y-8 mt-12 flex flex-col w-full">
       <div className="flex flex-col gap-[30px] bordr-b border-black-5 pb-10">
             <FormField
               control={form.control}
@@ -128,7 +117,7 @@ export function FormCreatePodcast() {
           <MyDropzone setPodcastURL={setPodcastURL} setImageURL={setImageURL}/>
     
             <div className="">
-              <Button type="submit"  className="text-base w-full bg-orange-1 py-4 font-extrabold text-white-1 transition-all duration-500 hover:bg-black-1">
+              <Button    className="text-base w-full bg-orange-1 py-4 font-extrabold text-white-1 transition-all duration-500 hover:bg-black-1">
                 {isLoading ? (<><Loader size={20} className="animate-spin ml-2" /> Submitting </>) : ("Submit & Publish Podcast")}
               </Button>
             </div>

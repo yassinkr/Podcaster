@@ -1,4 +1,4 @@
-"use server";
+"use strict";
 import './envConfig';
 import { drizzle } from 'drizzle-orm/vercel-postgres';
 import { sql } from 'drizzle-orm'
@@ -7,6 +7,7 @@ import { eq } from "drizzle-orm";
 import { sql as pg } from '@vercel/postgres';
 import { Podcast as Newpodcast} from '@/types';
 import { User as NewUser } from '@/types';
+import { auth } from '@clerk/nextjs/server';
 export const db =  drizzle(pg, { schema });
  
 
@@ -51,12 +52,15 @@ export async function getTopUserByPodcastCount() {
 export async function getPodcasts() {
   return await db.query.podcast.findMany();
 }
-export async function insertPodcast  (podcast: Newpodcast)  {
+export async function insertPodcast  (podcast: Newpodcast) :Promise<Newpodcast> {
+  const user = auth();
+  if (!user.userId) throw new Error("Unauthorized");
   if(!podcast) throw new Error('podcast is required');
+  podcast.userId = user.userId;
   const newPodcast = await db.insert(schema.podcast).values(podcast);
  
   
-  return newPodcast;
+  return podcast;
 }
 
 export async function UpdatePodcast (podcast:Newpodcast){

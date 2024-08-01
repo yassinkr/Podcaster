@@ -1,4 +1,4 @@
-"use server";
+
 import { WebhookEvent } from "@clerk/nextjs/server";
 import { headers } from "next/headers";
 import { Webhook } from "svix";
@@ -6,9 +6,7 @@ import {Users} from "@/server/schema";
 import * as queries from "@/server/db";
 import { NextResponse } from "next/server";
 
-async function GET(req: Request) {
-  return await req.json()
-}
+
 
 export async function POST(req: Request) {
 
@@ -33,7 +31,7 @@ export async function POST(req: Request) {
   }
 
   // Get the body
-  const payload =await GET(req); 
+  const payload = await req.json()
   const body = JSON.stringify(payload);
 
   // Create a new Svix instance with your secret.

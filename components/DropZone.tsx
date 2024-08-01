@@ -24,7 +24,8 @@ type DropProps = {
   setPodcastURL:Dispatch<SetStateAction<string>>,
   setImageURL:Dispatch<SetStateAction<string>>
 }
-export default function MyDropzone(props : DropProps) {
+export default function MyDropzone({setPodcastURL,setImageURL}:{ setPodcastURL:Dispatch<SetStateAction<string>>,
+  setImageURL:Dispatch<SetStateAction<string>>}) {
   const [files, setFiles] = useState<File[]>([]);
   const { startUpload, permittedFileInfo } = useUploadThing(
     "mediaPost",
@@ -57,7 +58,17 @@ export default function MyDropzone(props : DropProps) {
           console.log('file reading has ended');
           try {
             const result = await startUpload([file]);
-            console.log(result);
+            console.log("uploaded files", result);
+            console.log( result);
+            if(!result) throw new Error('no results')
+            if(result[0].type==="image/jpeg" ){
+             setImageURL(result[0].url);
+            }
+            if(result[0].type==="audio/mpeg"){
+              setPodcastURL(result[0].url)
+              
+      
+            }
           } catch (error) {
             console.error('Error uploading file:', error);
           }
@@ -80,10 +91,10 @@ export default function MyDropzone(props : DropProps) {
       console.log( result);
       if(!result) throw new Error('no results')
       if(result[0].type==="image" ){
-       props.setImageURL(result[0].url);
+       setImageURL(result[0].url);
       }
       if(result[0].type==="audio"){
-        props.setPodcastURL(result[0].url)
+      setPodcastURL(result[0].url)
 
       }
     } catch (error) {
