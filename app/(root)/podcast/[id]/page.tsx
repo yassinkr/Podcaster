@@ -6,6 +6,7 @@ import { getPodcastById, getPodcasts } from '@/server/db'
 import PodcastdetailPlayer from '@/components/PodcastdetailPlayer';
 import PodcastCard from '@/components/PodcastCard';
 import EmptyState from '@/components/EmptyState';
+import { Podcast } from '@/types';
 const PodcastDetails = async({params}:{
   params:{id : number}
 }) => {
@@ -34,7 +35,7 @@ const PodcastDetails = async({params}:{
       </h2>
       </figure>
       </header>
-      <PodcastdetailPlayer/>
+      <PodcastdetailPlayer podcast={podcast}/>
       <p className='text-white-1 text-lg pb-8 pt-11 font-medium max-md:text-center'>{podcast?.description}</p>
      <section className='flex flex-col gap-8'>
       <h1 className='text-xl font-bold text-white-1 '> Similar Podcasts:</h1>
