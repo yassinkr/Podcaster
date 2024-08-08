@@ -2,7 +2,7 @@
 import React, { useRef, useState, useEffect } from 'react';
 import { Button } from './ui/button';
 import { Slider } from './ui/slider';
-
+import Image from 'next/image';
 const AudioPlayer = ({ audioUrl }: { audioUrl: string }) => {
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const [isPlaying, setIsPlaying] = useState(false);
@@ -59,14 +59,21 @@ const AudioPlayer = ({ audioUrl }: { audioUrl: string }) => {
       setCurrentTime(Number(event.target.value));
     }
   };
-
+  const formatTime = (timeInSeconds: number) => {
+    const minutes = Math.floor(timeInSeconds / 60);
+    const seconds = Math.floor(timeInSeconds % 60);
+    return `${String(minutes).padStart(2, "0")}:${String(seconds).padStart(2, "0")}`;
+  };
   return (
     <div >
       <audio ref={audioRef} src={audioUrl} />
       <div className="controls">
-        <Button onClick={togglePlayPause} variant="secondary">
-          {isPlaying ? 'Pause' : 'Play'}
-        </Button>
+      
+      
+        <div className='flex justify-between items-center text-white-1 '>
+            <h4>{formatTime(currentTime ? currentTime : 0)}</h4>
+            <h4>{formatTime(audioRef.current ? audioRef.current.duration : 0)}</h4>
+        </div>
         <input
           type="range"
           min={0}
@@ -74,9 +81,35 @@ const AudioPlayer = ({ audioUrl }: { audioUrl: string }) => {
           value={currentTime}
           onChange={handleSeek}
         />
-        <span>{Math.floor(currentTime)} / {Math.floor(duration)} sec</span>
+        <div className='flex '>
+        <Button className='bg-black-1' onClick={togglePlayPause} variant="secondary">
+          <Image
+          src='/icons/reverse.svg'
+          width={24}
+          height={24}
+          alt="controler"/>
+        </Button>
+
+
+        <Button className='bg-white-1' onClick={togglePlayPause} variant="secondary">
+          <Image
+          src={isPlaying ? '/icons/Pause.svg' : '/icons/Play.svg'}
+          width={24}
+          height={24}
+          alt="controler"/>
+        </Button>
+        
+        
+        <Button className='bg-black-1' onClick={togglePlayPause} variant="secondary">
+          <Image
+          src='/icons/forward.svg'
+          width={24}
+          height={24}
+          alt="controler"/>
+        </Button>
+        </div>
+        </div>
       </div>
-    </div>
   );
 };
 
