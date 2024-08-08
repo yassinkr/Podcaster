@@ -3,12 +3,14 @@ import { auth } from '@clerk/nextjs/server'
 import React from 'react'
 import Image from 'next/image'
 import { Button } from './ui/button';
-import { deletePodcast, getUserByClerkId } from '@/server/db';
+import { deletePodcast, getPodcastByUserId, getUserByClerkId } from '@/server/db';
 import AudioPlayer from './AudioPlayer';
 const PodcastdetailPlayer =async ({podcast}:{podcast:Podcast}) => {
   const user = auth();
+  if(!user) throw new Error("user not found");
   if(!podcast.userId) throw new Error("podcast doesn't have owner");
- const owner = await getUserByClerkId(podcast.userId);
+  const userPodcast = await getPodcastByUserId(podcast.userId);
+  const owner = await getUserByClerkId(podcast.userId);
  if(!owner) throw new Error("podcast owner not found");
 
   return (
@@ -40,7 +42,7 @@ const PodcastdetailPlayer =async ({podcast}:{podcast:Podcast}) => {
             </figure>
           </article>
      
-          <AudioPlayer audioUrl={podcast.audioURL}/>
+          <AudioPlayer audioUrl={podcast.audioURL} userPodcast={userPodcast}/>
           </div>
           </div>
      {user && (

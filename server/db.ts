@@ -75,7 +75,7 @@ export async function UpdatePodcast (podcast:Newpodcast){
   return await db.update(schema.podcast).set(podcast).where(eq(schema.podcast.audioURL, podcast.audioURL));
 }
  
-export async function getPodcastByUserId (userId: string)  {
+export async function getPodcastByUserId (userId: string | null)  {
   if(!userId) throw new Error('author is required');
   return  await db.select().from(schema.podcast).where(eq(schema.podcast.userId, userId)).execute();
 }

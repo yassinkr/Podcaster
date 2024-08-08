@@ -3,12 +3,24 @@ import React, { useRef, useState, useEffect } from 'react';
 import { Button } from './ui/button';
 import { Slider } from './ui/slider';
 import Image from 'next/image';
-const AudioPlayer = ({ audioUrl }: { audioUrl: string }) => {
+import { Podcast } from '@/types';
+import { useRouter } from 'next/navigation';
+const AudioPlayer = ({ audioUrl ,userPodcast }: { audioUrl: string ,userPodcast:Podcast []}) => {
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const [isPlaying, setIsPlaying] = useState(false);
   const [currentTime, setCurrentTime] = useState(0);
   const [duration, setDuration] = useState(0);
-
+ const router = useRouter();
+ const handleNextPrev = (direction: string) => {
+    const currentIndex = userPodcast.findIndex((podcast) => podcast.audioURL === audioUrl);
+    if (direction === 'next') {
+      const nextIndex = (currentIndex + 1) % userPodcast.length;
+      router.push(`/podcast/${userPodcast[nextIndex].id}`);
+    } else if (direction === 'prev') {
+      const prevIndex = (currentIndex - 1 + userPodcast.length) % userPodcast.length;
+      router.push(`/podcast/${userPodcast[prevIndex].id}`);
+    }
+ }
   // Play or pause the audio
   const togglePlayPause = () => {
     if (audioRef.current) {
@@ -67,10 +79,10 @@ const AudioPlayer = ({ audioUrl }: { audioUrl: string }) => {
   return (
     <div >
       <audio ref={audioRef} src={audioUrl} />
-      <div className="controls">
+      <div className=" max-w-60">
       
       
-        <div className='flex justify-between items-center text-white-1 '>
+        <div className='flex justify-between items-center text-white-1'>
             <h4>{formatTime(currentTime ? currentTime : 0)}</h4>
             <h4>{formatTime(audioRef.current ? audioRef.current.duration : 0)}</h4>
         </div>
@@ -80,9 +92,10 @@ const AudioPlayer = ({ audioUrl }: { audioUrl: string }) => {
           max={duration}
           value={currentTime}
           onChange={handleSeek}
+          className='w-full'
         />
-        <div className='flex '>
-        <Button className='bg-black-1' onClick={togglePlayPause} variant="secondary">
+        <div className='flex justify-around items-center w-full'>
+        <Button className='bg-black-4' onClick={()=>handleNextPrev("prev")} variant="secondary">
           <Image
           src='/icons/reverse.svg'
           width={24}
@@ -100,7 +113,7 @@ const AudioPlayer = ({ audioUrl }: { audioUrl: string }) => {
         </Button>
         
         
-        <Button className='bg-black-1' onClick={togglePlayPause} variant="secondary">
+        <Button className='bg-black-4' onClick={()=>handleNextPrev("next")} variant="secondary">
           <Image
           src='/icons/forward.svg'
           width={24}
