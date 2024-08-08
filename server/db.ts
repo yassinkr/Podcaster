@@ -17,12 +17,14 @@ export async function getUsers() {
 
 export async function getUserById (id?: number)  {
   if(!id) throw new Error('id is required');
-  return await db.select().from(schema.Users).where(eq(schema.Users.id, id)).execute();
-}
+  return await db.query.Users.findFirst(
+    {where:(model,{eq})=>eq(model.id,id),}
+   );}
 export async function getUserByClerkId  (clerkId?: string ) {
   if(!clerkId) throw new Error('clerkId is required');
-  return await db.select().from(schema.Users).where(eq(schema.Users.clerkId, clerkId)).execute();
-}
+  return await db.query.Users.findFirst(
+    {where:(model,{eq})=>eq(model.clerkId,clerkId),}
+   );}
 
 export async function insertUser  (user?: NewUser)  {
   if(!user) throw new Error('user is required');
@@ -91,3 +93,8 @@ export async function getPodcastMaxViews() {
   return  await db.select().from(schema.podcast).orderBy(schema.podcast.views, sql`DESC`).limit(1).execute();
 }
 
+export async function deletePodcast (id?: number)  {
+  if(!id) throw new Error('id is required');
+  // add deleting the audio and the image from uploadthing
+  return await db.delete(schema.podcast).where(eq(schema.podcast.id, id));
+}
