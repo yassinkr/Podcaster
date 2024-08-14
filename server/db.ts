@@ -1,7 +1,7 @@
 "use strict";
 import './envConfig';
 import { drizzle } from 'drizzle-orm/vercel-postgres';
-import { sql } from 'drizzle-orm'
+import { sql , desc} from 'drizzle-orm'
 import * as schema from './schema';
 import { eq } from "drizzle-orm";
 import { sql as pg } from '@vercel/postgres';
@@ -20,7 +20,7 @@ export async function getUserById (id?: number)  {
   return await db.query.Users.findFirst(
     {where:(model,{eq})=>eq(model.id,id),}
    );}
-export async function getUserByClerkId  (clerkId?: string ) {
+export async function getUserByClerkId  (clerkId: string  | null | undefined)  {
   if(!clerkId) throw new Error('clerkId is required');
   return await db.query.Users.findFirst(
     {where:(model,{eq})=>eq(model.clerkId,clerkId),}
@@ -40,12 +40,8 @@ export async function deleteUser (clerkId?: string)  {
   return await db.delete(schema.Users).where(eq(schema.Users.clerkId, clerkId));
 }
 export async function getTopUserByPodcastCount() {
-  return await db.select({
-    userId: schema.podcast.userId,
-    count: sql<number>`count(${schema.podcast.userId})`.mapWith(Number)
-  }).from(schema.podcast).groupBy(sql`${schema.podcast.userId}`).orderBy(sql`COUNT(*)`, sql`DESC`).limit(1).execute();
-  }
-
+  return await db.select().from(schema.Users).orderBy(desc(schema.Users.views)).limit(6).execute();
+}
   export async function getPodcastById (id?: number)  {
     if(!id) throw new Error('id is required');
     return await db.query.podcast.findFirst(

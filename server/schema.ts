@@ -10,6 +10,7 @@ import {
   timestamp,
   uniqueIndex,
 } from 'drizzle-orm/pg-core';
+import { view } from 'drizzle-orm/sqlite-core';
 
 export const createTable = pgTableCreator((name) => `podcaster_${name}`);
 
@@ -23,6 +24,7 @@ export const Users = createTable(
       clerkId: text('clerkId').notNull(),
       createdAt: timestamp('createdAt').defaultNow().notNull(),
       podcastCount: integer('podcastCount').default(0).notNull(),
+      views: integer('views').default(0).notNull(),
     },
     (users) => {
       return {
