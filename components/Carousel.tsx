@@ -9,6 +9,7 @@ import { useRouter } from 'next/navigation';
 import { tree } from 'next/dist/build/templates/app-page';
 import { User } from '@/types/index';
 import Image from 'next/image';
+import { Loader } from 'lucide-react';
 
 const EmblaCarousel= ({TopUsers ,podcasts}:{TopUsers:User[],podcasts:Podcast[]}) => {
   const router = useRouter();
@@ -31,8 +32,11 @@ const EmblaCarousel= ({TopUsers ,podcasts}:{TopUsers:User[],podcasts:Podcast[]})
     onNavButtonClick
   )
   const slides = TopUsers && TopUsers?.filter((item : User)=>{if(item.podcastCount) item.podcastCount > 0})
- console.log(podcasts);
 
+ if(!podcasts) return(<div className='w-full h-screen flex justify-center items-center'>
+  <Loader size={30} className="animate-spin  text-orange-1"/>
+  </div>
+)
     return (
     <section className="flex w-full flex-col gap-4 overflow-hidden"  ref={emblaRef}>
       <div className="flex">
@@ -47,8 +51,9 @@ const EmblaCarousel= ({TopUsers ,podcasts}:{TopUsers:User[],podcasts:Podcast[]})
               fill
               className="absolute size-full rounded-xl border-none"
               />
-              <div>
-                <h2 className='text-sm font-semibold text-white-1'>{index.title}</h2>
+              <div className='glassmorphism-black relative z-10 flex flex-col p-4 rounded-b-xl '>
+                <h2 className='text-sm font-bold text-white-1'>{index.title}</h2>
+                <h2 className='text-sm text-white-1'>{index.description}</h2>
                 
               </div>
               </figure>
