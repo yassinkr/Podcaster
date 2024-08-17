@@ -1,4 +1,4 @@
-import { getTopUserByPodcastCount, getUserByClerkId } from '@/server/db';
+import {  getPodcasts, getTopUserByPodcastCount, getUserByClerkId } from '@/server/db';
 import { SignInButton, SignedIn, SignedOut, UserButton } from '@clerk/nextjs'
 import { auth } from '@clerk/nextjs/server'
 import Link from 'next/link';
@@ -10,13 +10,12 @@ import Carousel from './Carousel';
 const RightSideBar = async () => {
   const user = auth();
   const topUsers = await getTopUserByPodcastCount();
-  if (topUsers) console.log(topUsers);
-   if (user) var userData= await getUserByClerkId(user.userId);
+  const podcasts= await getPodcasts();
+  if (user.userId) var userData= await getUserByClerkId(user.userId);
+  
   return (
     <section className='right_sidebar text-white-1'>
-      <SignedOut>
-      <SignInButton/>
-      </SignedOut>
+
       <SignedIn>
         <Link href={ `/profile/${userData?.id}`} className='flex gap-3 pb-12'>
         <UserButton/>
@@ -35,7 +34,7 @@ const RightSideBar = async () => {
       </SignedIn>
       <section>
         <Header headerTitle='For fans like you' titleClassName=''/>
-        <Carousel slides={topUsers}/>
+        <Carousel TopUsers={topUsers} podcasts={podcasts}/>
 
       </section>
 

@@ -3,8 +3,8 @@
 import { Dispatch, SetStateAction } from "react";
 import * as schema from "@/server/schema"
 
-export type User = typeof schema.Users.$inferInsert;
-export type Podcast = typeof schema.podcast.$inferInsert;
+export type User = typeof schema.Users.$inferSelect;
+export type Podcast = typeof schema.podcast.$inferSelect;
 
 export interface SoundModel {
   name: string; // The name of the sound model

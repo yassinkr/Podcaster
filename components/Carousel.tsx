@@ -1,17 +1,18 @@
+"use client";
 import React, { useCallback } from 'react'
 import { EmblaOptionsType, EmblaCarouselType } from 'embla-carousel'
 import { DotButton, useDotButton } from './EmblaCarouselDotButton'
 import Autoplay from 'embla-carousel-autoplay'
 import useEmblaCarousel from 'embla-carousel-react'
+import { CarouselProps, Podcast } from '@/types';
+import { useRouter } from 'next/navigation';
+import { tree } from 'next/dist/build/templates/app-page';
+import { User } from '@/types/index';
+import Image from 'next/image';
 
-type PropType = {
-  slides: number[]
-  options: EmblaOptionsType
-}
-
-const EmblaCarousel: React.FC<PropType> = (props) => {
-  const { slides, options } = props
-  const [emblaRef, emblaApi] = useEmblaCarousel(options,[Autoplay()])
+const EmblaCarousel= ({TopUsers ,podcasts}:{TopUsers:User[],podcasts:Podcast[]}) => {
+  const router = useRouter();
+  const [emblaRef, emblaApi] = useEmblaCarousel({loop: true},[Autoplay()])
 
   const onNavButtonClick = useCallback((emblaApi: EmblaCarouselType) => {
     const autoplay = emblaApi?.plugins()?.autoplay
@@ -29,19 +30,31 @@ const EmblaCarousel: React.FC<PropType> = (props) => {
     emblaApi,
     onNavButtonClick
   )
+  const slides = TopUsers && TopUsers?.filter((item : User)=>{if(item.podcastCount) item.podcastCount > 0})
+ console.log(podcasts);
 
-  return (
-    <section className="embla">
-      <div className="embla__viewport" ref={emblaRef}>
-        <div className="embla__container">
-          {slides.map((index) => (
-            <div className="embla__slide" key={index}>
-              <div className="embla__slide__number">{index + 1}</div>
-            </div>
+    return (
+    <section className="flex w-full flex-col gap-4 overflow-hidden"  ref={emblaRef}>
+      <div className="flex">
+          {podcasts.slice(0,5).map((index) => (
+            <figure  key={index.id}
+            className='carousel_box'
+            onClick={()=>router.push(`/podcast/${index.id}`)}
+            >
+              <Image
+              src={index.imageURL}
+              alt='card'
+              fill
+              className="absolute size-full rounded-xl border-none"
+              />
+              <div>
+                <h2 className='text-sm font-semibold text-white-1'>{index.title}</h2>
+                
+              </div>
+              </figure>
           ))}
-        </div>
+        
       </div>
-
       <div className="embla__controls">
         <div className="embla__dots">
           {scrollSnaps.map((_, index) => (

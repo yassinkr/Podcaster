@@ -86,7 +86,7 @@ export async function getPodcastByDescription (description?: string)  {
 
 
 export async function getPodcastMaxViews() {
-  return  await db.select().from(schema.podcast).orderBy(schema.podcast.views, sql`DESC`).limit(1).execute();
+  return  await db.select().from(schema.podcast).orderBy(desc(schema.podcast.views)).limit(1).execute();
 }
 
 export async function deletePodcast (id?: number)  {
