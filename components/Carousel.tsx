@@ -60,18 +60,14 @@ const EmblaCarousel= ({TopUsers ,podcasts}:{TopUsers:User[],podcasts:Podcast[]})
           ))}
         
       </div>
-      <div className="embla__controls">
-        <div className="embla__dots">
+        <div className="flex justify-center gap-2 ">
           {scrollSnaps.map((_, index) => (
             <DotButton
               key={index}
               onClick={() => onDotButtonClick(index)}
-              className={'embla__dot'.concat(
-                index === selectedIndex ? ' embla__dot--selected' : ''
-              )}
+              selected={index=== selectedIndex}
             />
           ))}
-        </div>
       </div>
     </section>
   )

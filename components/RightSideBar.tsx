@@ -37,7 +37,18 @@ const RightSideBar = async () => {
         <Carousel TopUsers={topUsers} podcasts={podcasts}/>
 
       </section>
-
+      <section className='flex flex-col gap-8 pt-12'>
+      <Header headerTitle='Top Podcasters' titleClassName=''/>
+      <div className=' flex flex-col gap-6'>
+       {topUsers?.slice(0,4).map((podcaster)=>(
+        <Link href={`/profile/${podcaster.clerkId}`}>
+        <div key={podcaster.id} className='flex cursor-pointer justify-between'>
+        
+        </div>
+        </Link>
+       ))}
+      </div>
+      </section>
     </section>
   )
 }
