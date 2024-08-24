@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Inter } from "next/font/google";
+import {  Manrope } from "next/font/google";
 import "./globals.css";
 import {
   ClerkProvider,
@@ -8,9 +8,10 @@ import {NextSSRPlugin} from '@uploadthing/react/next-ssr-plugin'
 import { extractRouterConfig } from "uploadthing/server";
 import { ourFileRouter } from "./api/uploadthing/core";
 import { Toaster } from "@/components/ui/sonner"
+import AudioProvider from "@/providers/AudioProvider";
 
 
-const inter = Inter({ subsets: ["latin"] });
+const manrope = Manrope({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
   title: "Podcaster",
@@ -46,10 +47,12 @@ export default function RootLayout({
     }}>
     <html lang="en">
       <NextSSRPlugin routerConfig={extractRouterConfig(ourFileRouter)}/>
-      <body className={inter.className}>{children}
+      <AudioProvider>
+      <body className={manrope.className}>{children}
       <Toaster />
 
       </body>
+      </AudioProvider>
     </html>
     </ClerkProvider>
   );
