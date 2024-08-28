@@ -1,26 +1,69 @@
-import { Podcast } from '@/types';
-import { auth } from '@clerk/nextjs/server'
-import React from 'react'
-import Image from 'next/image'
-import { Button } from './ui/button';
-import { deletePodcast, getPodcastByUserId, getUserByClerkId } from '@/server/db';
-import AudioPlayer from './AudioPlayer';
-import { redirect } from 'next/navigation';
+"use client";
+import Image from "next/image";
+import { useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
 
-const PodcastdetailPlayer = async ({ podcast }: { podcast: Podcast }) => {
-  const user = auth();
-  if (!user) throw new Error("user not found");
-  if (!podcast.userId) throw new Error("podcast doesn't have an owner");
-  const userPodcast = await getPodcastByUserId(podcast.userId);
-  const owner = await getUserByClerkId(podcast.userId);
-  const isOwner = user.userId === podcast.userId;
-  if (!owner) throw new Error("podcast owner not found");
+import { useAudio } from '@/providers/AudioProvider';
+import { Podcast, PodcastDetailPlayerProps, Podcasts, User } from "@/types";
 
+import { Loader } from "lucide-react";
+import { Button } from "./ui/button";
+//import { useToast } from "./ui/use-toast";
+import { QueryResult } from "@vercel/postgres";
+
+const PodcastDetailPlayer = ({
+podcast , 
+deletePodcast,
+getUserByClerkId
+}: {podcast:Podcasts , deletePodcast:(id?: number | undefined) => Promise<QueryResult<never>>,
+   getUserByClerkId:(clerkId: string | null | undefined) => Promise<User | undefined> }) => {
+  const router = useRouter();
+  const { setAudio } = useAudio();
+  //const { toast } = useToast();
+  const [isDeleting, setIsDeleting] = useState(false);
+  const [owner, setOwner] = useState<User |null>(null);
+  const [isOwner, setIsOwner] = useState(false);
+  useEffect(() => {
+  
+    const fetchOwner = async () => {
+      if (!podcast.userId) return;
+      const ownerData = await getUserByClerkId(podcast.userId);
+      if(ownerData) setOwner(ownerData);
+      if(owner?.clerkId === podcast.userId) setIsOwner(true);
+    };
+  
+    fetchOwner();
+  }, [podcast.userId]);
+
+  
   const handleDelete = async () => {
-    "use server"; 
-    await deletePodcast(podcast.id);
-    redirect('/'); // Redirect to home after deletion
+    try {
+     if(!podcast.id) throw new Error("Podcast id is missing")
+      await deletePodcast(podcast.id);
+     // toast({   title: "Podcast deleted", });
+      router.push("/");
+    } catch (error) {
+      console.error("Error deleting podcast", error);
+    //  toast({
+      //  title: "Error deleting podcast",
+      //  variant: "destructive",
+     // });
+    }
   };
+
+  const handlePlay = () => {
+    const podcastId = podcast.id.toString();
+    const author = owner?.name || "";
+    setAudio({
+      title: podcast.title,
+      audioUrl: podcast.audioURL,
+      imageUrl: podcast.imageURL,
+      author:author,
+      podcastId,
+    });
+  };
+
+  if (!podcast || ! owner ) return <Loader />;
 
   return (
     <div className="mt-6 flex w-full justify-between max-md:justify-center">
@@ -37,9 +80,14 @@ const PodcastdetailPlayer = async ({ podcast }: { podcast: Podcast }) => {
             <h1 className="text-32 font-extrabold tracking-[-0.32px] text-white-1">
               {podcast.title}
             </h1>
-            <figure className="flex cursor-pointer items-center gap-2">
+            <figure
+              className="flex cursor-pointer items-center gap-2"
+              onClick={() => {
+                router.push(`/profile/${podcast.userId}`);
+              }}
+            >
               <Image
-                src={podcast.imageURL}
+                src={owner?.image}
                 width={30}
                 height={30}
                 alt="Caster icon"
@@ -49,7 +97,18 @@ const PodcastdetailPlayer = async ({ podcast }: { podcast: Podcast }) => {
             </figure>
           </article>
 
-          <AudioPlayer audioUrl={podcast.audioURL} userPodcast={userPodcast} />
+          <Button
+            onClick={handlePlay}
+            className="text-16 w-full max-w-[250px] bg-orange-1 font-extrabold text-white-1"
+          >
+            <Image
+              src="/icons/Play.svg"
+              width={20}
+              height={20}
+              alt="random play"
+            />{" "}
+            &nbsp; Play podcast
+          </Button>
         </div>
       </div>
       {isOwner && (
@@ -60,18 +119,25 @@ const PodcastdetailPlayer = async ({ podcast }: { podcast: Podcast }) => {
             height={30}
             alt="Three dots icon"
             className="cursor-pointer"
+            onClick={() => setIsDeleting((prev) => !prev)}
           />
-          <div className="absolute right-0 top-0 mt-5 bg-white rounded-lg p-4 shadow-md hidden lg:flex lg:flex-col">
-            <form action={handleDelete}>
-              <Button type="submit" variant="destructive" className='bg-red-600 text-white-1 text-lg'>
-                Delete
-              </Button>
+          {isDeleting && (
+            <form action = {async ()=>{await handleDelete()}} 
+              className="absolute -left-32 -top-2 z-10 flex w-32 cursor-pointer justify-center gap-2 rounded-md bg-black-6 py-1.5 hover:bg-black-2"
+            >
+              <Image
+                src="/icons/delete.svg"
+                width={16}
+                height={16}
+                alt="Delete icon"
+              />
+              <h2 className="text-16 font-normal text-white-1">Delete</h2>
             </form>
-          </div>
+          )}
         </div>
       )}
     </div>
-  )
-}
+  );
+};
 
-export default PodcastdetailPlayer;
+export default PodcastDetailPlayer;

@@ -6,7 +6,9 @@ import { getPodcastById, getPodcasts } from '@/server/db'
 import PodcastdetailPlayer from '@/components/PodcastdetailPlayer';
 import PodcastCard from '@/components/PodcastCard';
 import EmptyState from '@/components/EmptyState';
-import { Podcast } from '@/types';
+import { Podcast, User } from '@/types';
+import { deletePodcast,getUserByClerkId } from '@/server/db';
+import { QueryResult } from '@vercel/postgres';
 const PodcastDetails = async({params}:{
   params:{id : number}
 }) => {
@@ -17,6 +19,24 @@ const PodcastDetails = async({params}:{
     <Loader size={30} className="animate-spin  text-orange-1"/>
     </div>
   )
+  async function handleDeletePodcast(id:number | undefined) :Promise<QueryResult<never>>{ 
+    "use server";
+    return await deletePodcast(id);
+  }
+
+  async function handleGetUserByClerkId(id:string | null | undefined) :Promise<{
+    id: number;
+    name: string;
+    email: string;
+    image: string;
+    clerkId: string;
+    createdAt: Date;
+    podcastCount: number;
+    views: number;
+} | undefined>{ 
+    "use server";
+    return await getUserByClerkId(id);
+  }
 
   return (
      <section className=' flex w-full flex-col '>
@@ -35,7 +55,7 @@ const PodcastDetails = async({params}:{
       </h2>
       </figure>
       </header>
-      <PodcastdetailPlayer podcast={podcast}/>
+      <PodcastdetailPlayer podcast={podcast} deletePodcast={handleDeletePodcast} getUserByClerkId={handleGetUserByClerkId}/>
       <p className='text-white-1 text-lg pb-8 pt-11 font-medium max-md:text-center'>{podcast?.description}</p>
      <section className='flex flex-col gap-8'>
       <h1 className='text-xl font-bold text-white-1 '> Similar Podcasts:</h1>

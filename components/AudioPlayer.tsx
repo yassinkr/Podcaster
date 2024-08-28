@@ -1,26 +1,34 @@
 "use client";
 import React, { useRef, useState, useEffect } from 'react';
 import { Button } from './ui/button';
-import { Slider } from './ui/slider';
 import Image from 'next/image';
-import { Podcast } from '@/types';
+import { Podcasts } from '@/types';
 import { useRouter } from 'next/navigation';
-const AudioPlayer = ({ audioUrl ,userPodcast }: { audioUrl: string ,userPodcast:Podcast []}) => {
+import { useAudio } from '@/providers/AudioProvider';
+import { Progress } from "@/components/ui/progress"
+
+
+const AudioPlayer = ({ audioUrl ,userPodcast }: { audioUrl: string ,userPodcast:Podcasts [] | undefined}) => {
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const [isPlaying, setIsPlaying] = useState(false);
   const [currentTime, setCurrentTime] = useState(0);
   const [duration, setDuration] = useState(0);
  const router = useRouter();
- const handleNextPrev = (direction: string) => {
-    const currentIndex = userPodcast.findIndex((podcast) => podcast.audioURL === audioUrl);
-    if (direction === 'next') {
-      const nextIndex = (currentIndex + 1) % userPodcast.length;
-      router.push(`/podcast/${userPodcast[nextIndex].id}`);
-    } else if (direction === 'prev') {
-      const prevIndex = (currentIndex - 1 + userPodcast.length) % userPodcast.length;
-      router.push(`/podcast/${userPodcast[prevIndex].id}`);
-    }
- }
+ var currentIndex :number | undefined = 0;
+ if(userPodcast) currentIndex= userPodcast.findIndex((podcast) => podcast.audioURL === audioUrl);
+ //const [currentPodcast, setCurrentPodcast] = useState(userPodcast[currentIndex]);
+
+ //const handleNextPrev = (direction: string) => {
+  //  if (direction === 'next') {
+    //  const nextIndex = (currentIndex + 1) % userPodcast.length;
+     // router.push(`/podcast/${userPodcast[nextIndex].id}`);
+   // } else if (direction === 'prev') {
+     // const prevIndex = (currentIndex - 1 + userPodcast.length) % userPodcast.length;
+   //   router.push(`/podcast/${userPodcast[prevIndex].id}`);
+   // }
+ //}
+
+  const {audio , setAudio} = useAudio();
   // Play or pause the audio
   const togglePlayPause = () => {
     if (audioRef.current) {
@@ -50,8 +58,10 @@ const AudioPlayer = ({ audioUrl ,userPodcast }: { audioUrl: string ,userPodcast:
   // Update current time as audio plays
   useEffect(() => {
     const handleTimeUpdate = () => {
+      //setCurrentPodcast(userPodcast[currentIndex]);
       if (audioRef.current) {
         setCurrentTime(audioRef.current.currentTime);
+
       }
     };
 
@@ -77,7 +87,8 @@ const AudioPlayer = ({ audioUrl ,userPodcast }: { audioUrl: string ,userPodcast:
     return `${String(minutes).padStart(2, "0")}:${String(seconds).padStart(2, "0")}`;
   };
   return (
-    <div >
+    <div className='w-full' >
+      <Progress value={currentTime/duration *100} className='w-full'/>
       <audio ref={audioRef} src={audioUrl} />
       <div className=" max-w-60">
       
@@ -95,7 +106,7 @@ const AudioPlayer = ({ audioUrl ,userPodcast }: { audioUrl: string ,userPodcast:
           className='w-full'
         />
         <div className='flex justify-around items-center w-full'>
-        <Button className='bg-black-4' onClick={()=>handleNextPrev("prev")} variant="secondary">
+        <Button className='bg-black-4' onClick={()=>{}} variant="secondary">
           <Image
           src='/icons/reverse.svg'
           width={24}
@@ -104,7 +115,13 @@ const AudioPlayer = ({ audioUrl ,userPodcast }: { audioUrl: string ,userPodcast:
         </Button>
 
 
-        <Button className='bg-white-1' onClick={togglePlayPause} variant="secondary">
+        <Button className='bg-white-1' onClick={
+          ()=>{togglePlayPause();}}
+            //  if(!audio){
+              //  setAudio({title:currentPodcast.title,audioUrl,author: currentPodcast.userId? currentPodcast.userId : ""
+               //   ,imageUrl:currentPodcast.imageURL,podcastId:currentPodcast.id.toString()});
+             // }}}
+         variant="secondary">
           <Image
           src={isPlaying ? '/icons/Pause.svg' : '/icons/Play.svg'}
           width={24}
@@ -113,7 +130,7 @@ const AudioPlayer = ({ audioUrl ,userPodcast }: { audioUrl: string ,userPodcast:
         </Button>
         
         
-        <Button className='bg-black-4' onClick={()=>handleNextPrev("next")} variant="secondary">
+        <Button className='bg-black-4' onClick={()=>{}} variant="secondary">
           <Image
           src='/icons/forward.svg'
           width={24}
