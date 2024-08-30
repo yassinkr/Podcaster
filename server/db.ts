@@ -56,6 +56,16 @@ export async function getTopUserByPodcastCount() {
 export async function getPodcasts() {
   return await db.query.podcast.findMany();
 }
+
+export async function getPodcastBySearch (search?: string)  {
+  if(search === '') return; 
+  if(!search) throw new Error('search is required');
+  const ByTitle =  await db.select().from(schema.podcast).where(sql`title ILIKE ${search}`).execute();
+  if(ByTitle.length > 0) return ByTitle;
+  const ByDescription = await db.select().from(schema.podcast).where(sql`description ILIKE ${search}`).execute();
+  if(ByDescription.length > 0) return ByDescription;
+  return ;
+}
 export async function insertPodcast  (podcast: Newpodcast) :Promise<Newpodcast> {
   const user = auth();
   if (!user.userId) throw new Error("Unauthorized");
