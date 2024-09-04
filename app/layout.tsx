@@ -7,7 +7,6 @@ import {
 import {NextSSRPlugin} from '@uploadthing/react/next-ssr-plugin'
 import { extractRouterConfig } from "uploadthing/server";
 import { ourFileRouter } from "./api/uploadthing/core";
-import { Toaster } from "@/components/ui/sonner"
 import AudioProvider from "@/providers/AudioProvider";
 
 
@@ -49,7 +48,7 @@ export default function RootLayout({
       <NextSSRPlugin routerConfig={extractRouterConfig(ourFileRouter)}/>
       <AudioProvider>
       <body className={manrope.className}>{children}
-      <Toaster />
+     
 
       </body>
       </AudioProvider>

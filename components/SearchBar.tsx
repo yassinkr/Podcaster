@@ -3,12 +3,12 @@ import React, { use, useEffect, useState } from 'react'
 import Image from 'next/image'
 import { usePathname, useRouter } from 'next/navigation';
 import { Input } from './ui/input';
+import { useDebounce } from '@/lib/useDebounce';
 
 const SearchBar = () => {
     const [search, setSearch] = useState('')
     const router = useRouter();
     const pathname = usePathname();
-
     useEffect(() => {
         if(!search && pathname === '/discover'){
             router.push("/discover");

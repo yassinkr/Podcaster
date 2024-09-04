@@ -1,7 +1,7 @@
 "use strict";
 import './envConfig';
 import { drizzle } from 'drizzle-orm/vercel-postgres';
-import { sql , desc} from 'drizzle-orm'
+import { sql , desc ,like} from 'drizzle-orm'
 import * as schema from './schema';
 import { eq } from "drizzle-orm";
 import { sql as pg } from '@vercel/postgres';
@@ -60,9 +60,9 @@ export async function getPodcasts() {
 export async function getPodcastBySearch (search?: string)  {
   if(search === '') return; 
   if(!search) throw new Error('search is required');
-  const ByTitle =  await db.select().from(schema.podcast).where(sql`title ILIKE ${search}`).execute();
+  const ByTitle =  await db.select().from(schema.podcast).where(like(schema.podcast.title, `%${search}%`)).execute();
   if(ByTitle.length > 0) return ByTitle;
-  const ByDescription = await db.select().from(schema.podcast).where(sql`description ILIKE ${search}`).execute();
+  const ByDescription = await db.select().from(schema.podcast).where(like(schema.podcast.description, `%${search}%`)).execute();
   if(ByDescription.length > 0) return ByDescription;
   return ;
 }

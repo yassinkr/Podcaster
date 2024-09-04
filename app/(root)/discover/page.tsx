@@ -1,11 +1,13 @@
 import EmptyState from '@/components/EmptyState';
 import PodcastCard from '@/components/PodcastCard';
 import SearchBar from '@/components/SearchBar';
-import { getPodcastBySearch } from '@/server/db';
+import { getPodcastBySearch, getPodcasts } from '@/server/db';
+import { Loader } from 'lucide-react';
 import React from 'react'
 
 const Discover = async ({searchParams: {search}}:{searchParams:{search : string}}) => {
   const podcasts= await getPodcastBySearch(search ? search : '');
+  const discover = await getPodcasts();
   return (
     <div className=" flex flex-col gap-9">
       <SearchBar/>
@@ -15,8 +17,14 @@ const Discover = async ({searchParams: {search}}:{searchParams:{search : string}
        {podcasts.length > 0 ? <div className='podcast_grid'>
         {podcasts.map(podcast => (
           <PodcastCard id={podcast.id} imgURL={podcast.imageURL} title={podcast.title}  description={podcast.description}/>))}
-        </div>:<></>}
-       </> : <EmptyState title={'No Results found'}/>}
+        </div>:<EmptyState title={'No Results found'}/>}
+       </> : <>{ discover && !podcasts ? <div className='podcast_grid'>
+        {discover.map(podcast => (
+          <PodcastCard id={podcast.id} imgURL={podcast.imageURL} title={podcast.title}  description={podcast.description}/>))}
+       </div> : <Loader size={50} className='mx-auto'/>}
+      </>
+
+}
       </div>
     </div>
   )

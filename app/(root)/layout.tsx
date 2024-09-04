@@ -3,6 +3,7 @@ import MobileNav from "@/components/MobileNav";
 import PodcastPlayer from "@/components/PodcastPlayer";
 import RightSideBar from "@/components/RightSideBar";
 import Image from "next/image";
+import { Toaster } from "sonner";
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -18,7 +19,8 @@ export default function RootLayout({
               <Image src="/icons/logo.svg" alt="logo" width={30} height={30} />
               <MobileNav/>
             </div>
-            <div className="flex flex-col md:pb-14">Toaster
+            <div className="flex flex-col md:pb-14">
+            <Toaster />
             {children}
             </div>
             </div>
